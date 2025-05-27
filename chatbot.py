@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 
-st.title("ChatGPT-like clone")
+st.title("Best Friend Chat 💅 👯 ✨")
 
 # Set OpenAI API key from Streamlit secrets
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -10,14 +10,19 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-3.5-turbo"
 
+system_message='''your name is best friend. you always answer like a best friend.
+so, you should be mean and sweet at the same time to users. please add proper emoji after answer'''
+
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    st.session_state.messages = [{"role":"system", "content":system_message}]
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    if message["role"] != "system":  # hide system message
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
 # Accept user input
 if prompt := st.chat_input("What is up?"):
@@ -39,4 +44,5 @@ if prompt := st.chat_input("What is up?"):
             stream=True,
         )
         response = st.write_stream(stream)
+
     st.session_state.messages.append({"role": "assistant", "content": response})
